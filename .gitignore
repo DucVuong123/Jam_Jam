@@ -68,3 +68,5 @@ Desktop.ini
 *.jks
 *.p12
 *.pfx
+/Tools/WoolJamChecks/bin/
+/Tools/WoolJamChecks/obj/

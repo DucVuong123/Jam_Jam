@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a312446fd065f44988541bcb03688c6, type: 3}
+  m_Name: WoolArt
+  m_EditorClassIdentifier: Assembly-CSharp::JamJam.WoolArt
+  Yarn:
+  - {fileID: 2100000, guid: 8285eb46db8538945bf059cd2cbd7fbe, type: 2}
+  - {fileID: 2100000, guid: e7eac10a441c20649a6c08b4e4d887cd, type: 2}
+  - {fileID: 2100000, guid: f86de3cf36f59764393f1b76445341fb, type: 2}
+  - {fileID: 2100000, guid: c9ea7163c93e1ba4db642ca578fc0d56, type: 2}
+  - {fileID: 2100000, guid: 8db32c85b5063e940b696494baf687d1, type: 2}
+  - {fileID: 2100000, guid: d21f85d5f0748a541b9683763a3f7c77, type: 2}
+  Thread:
+  - {fileID: 2100000, guid: 517274f9a92860845a385ce4484f1166, type: 2}
+  - {fileID: 2100000, guid: 5bfad40a6530361458a0d14f01b33eec, type: 2}
+  - {fileID: 2100000, guid: 64f8b0d996701d44391d87747d813781, type: 2}
+  - {fileID: 2100000, guid: c37d8259078ad9e41853f4f15269b8e3, type: 2}
+  - {fileID: 2100000, guid: e212ece9177bb0949a1b6150f1a12933, type: 2}
+  - {fileID: 2100000, guid: b28e660ce092e054bba0312d7019c3b3, type: 2}
+  Block: {fileID: 350152804724440137, guid: ef79824e75c9f7f4cba2e190b12ad5dc, type: 3}
+  Spool: {fileID: 7057242825521221244, guid: ed242d0f80e453b4a9cd141cda00dac0, type: 3}
+  Segment: {fileID: 6915671021382783851, guid: d8c699b735f504d42b0a4cef23158100, type: 3}
+  Dragon: {fileID: 1137740316213785470, guid: 612a6e27b709a1349a5f2214e2e7a289, type: 3}
+  Kitten: {fileID: 6300193180800567630, guid: 2959e92be21daf14f8431b20f3a8b803, type: 3}
+  Slot: {fileID: 5831807426582418240, guid: 7b65a3a5c3f638a4399299acbbe48b79, type: 3}
+  Confetti: {fileID: 6755635825629824449, guid: 2be45e35edacea6468348adf61a0e3b2, type: 3}
+  Road: {fileID: 2100000, guid: d7c2e543d86521f43ae0b3fa6d6d0a71, type: 2}
+  Rim: {fileID: 2100000, guid: 5e7b2c73b7d08ef4e8cdcfccd8cdf16f, type: 2}
