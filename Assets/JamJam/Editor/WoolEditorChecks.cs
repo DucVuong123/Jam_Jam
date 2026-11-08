@@ -65,8 +65,10 @@ namespace JamJam.Editor
             if(state==PlayModeStateChange.EnteredEditMode && SessionState.GetBool("WoolJam.Batch",false))
             {
                 SessionState.SetBool("WoolJam.Batch",false);
-                if(SessionState.GetBool("WoolJam.HadProgress",false)) PlayerPrefs.SetInt("JamJam.Level",SessionState.GetInt("WoolJam.OldProgress",0));
-                else PlayerPrefs.DeleteKey("JamJam.Level");
+                if(SessionState.GetBool("WoolJam.HadProgress",false)) PlayerPrefs.SetInt(WoolProgress.ClearedKey,SessionState.GetInt("WoolJam.OldProgress",0));
+                else PlayerPrefs.DeleteKey(WoolProgress.ClearedKey);
+                if(SessionState.GetBool("WoolJam.HadLegacy",false)) PlayerPrefs.SetInt(WoolProgress.LegacyKey,SessionState.GetInt("WoolJam.OldLegacy",0));
+                else PlayerPrefs.DeleteKey(WoolProgress.LegacyKey);
                 PlayerPrefs.Save();
                 EditorApplication.Exit(0);
             }
@@ -91,7 +93,7 @@ namespace JamJam.Editor
                     for(var i=0;i<30000 && scene.State.Status==RoundStatus.Playing;i++) scene.State.Step(0.02f);
                     if(scene.State.Status!=RoundStatus.Lost) throw new InvalidOperationException("Loss did not trigger");
                     File.AppendAllText(Report,"LOSS PASS\n");
-                    capture?.Dispose(); capture=Observable.Timer(TimeSpan.FromSeconds(0.5),UnityTimeProvider.Update).Subscribe(_=>Capture("loss"));
+                    capture?.Dispose(); capture=Observable.Timer(TimeSpan.FromSeconds(WoolScene.LoseResultDelay+WoolPopIn.DefaultScaleTime),UnityTimeProvider.Update).Subscribe(_=>Capture("loss"));
                 }
                 else if(command=="retry")
                 {
@@ -114,22 +116,25 @@ namespace JamJam.Editor
                 File.WriteAllText(Report,"UNITY VERIFICATION STARTED\n");
                 WoolSceneBuilder.Build();
                 ValidateLevels();
-                var scaleMesh=AssetDatabase.LoadAssetAtPath<Mesh>(WoolAssetsBuilder.Root+"/Meshes/KnittedScale.asset");
-                var vertices=scaleMesh.vertices; var normals=scaleMesh.normals;
-                var outer=0; for(var i=1;i<vertices.Length;i++) if(vertices[i].x>vertices[outer].x) outer=i;
-                if(normals[outer].x<=0) throw new InvalidOperationException("Scale mesh has inward facing triangles");
+                var chevronMesh=AssetDatabase.LoadAssetAtPath<Mesh>(WoolAssetsBuilder.Root+"/Meshes/Chevron.asset");
+                var vertices=chevronMesh.vertices; var normals=chevronMesh.normals;
+                var outer=0; for(var i=1;i<vertices.Length;i++) if(vertices[i].y>vertices[outer].y) outer=i;
+                if(normals[outer].y<=0) throw new InvalidOperationException("Chevron mesh has inward facing triangles");
                 File.AppendAllText(Report,"MESH FACING PASS\n");
                 var art=AssetDatabase.LoadAssetAtPath<WoolArt>(WoolAssetsBuilder.Root+"/WoolArt.asset");
-                if(art.Kitten.GetComponentInChildren<SpriteRenderer>()==null || art.Dragon.GetComponentInChildren<SpriteRenderer>()==null || art.Block.GetComponent<WoolBlockView>().Body.GetComponent<SpriteRenderer>()==null)
-                    throw new InvalidOperationException("Character or block sprite is missing");
-                if(art.Kitten.GetComponentsInChildren<MeshRenderer>().Length!=0 || art.Dragon.GetComponentsInChildren<MeshRenderer>().Length!=0)
-                    throw new InvalidOperationException("Legacy character model is still present");
+                if(art.Kitten.GetComponentInChildren<SpriteRenderer>()==null || art.Dragon.GetComponentInChildren<SpriteRenderer>()==null || art.Block.GetComponent<WoolBlockView>().Body.GetComponent<MeshRenderer>()==null)
+                    throw new InvalidOperationException("Character sprite or block mesh is missing");
+                foreach(var renderer in art.Kitten.GetComponentsInChildren<MeshRenderer>())
+                    if(renderer.name!="Bubble") throw new InvalidOperationException("Legacy character model is still present");
+                if(art.Dragon.GetComponentsInChildren<MeshRenderer>().Length!=0) throw new InvalidOperationException("Legacy character model is still present");
                 var spriteShader=art.Dragon.GetComponentInChildren<SpriteRenderer>().sharedMaterial.shader;
                 if(ShaderUtil.ShaderHasError(spriteShader)) throw new InvalidOperationException("Sprite shader has compilation errors");
                 File.AppendAllText(Report,"SPRITE PREFABS AND SHADER PASS\n");
                 File.AppendAllText(Report,"BUILD COMPILE PASS\n");
-                SessionState.SetBool("WoolJam.HadProgress",PlayerPrefs.HasKey("JamJam.Level"));
-                SessionState.SetInt("WoolJam.OldProgress",PlayerPrefs.GetInt("JamJam.Level",0));
+                SessionState.SetBool("WoolJam.HadProgress",PlayerPrefs.HasKey(WoolProgress.ClearedKey));
+                SessionState.SetInt("WoolJam.OldProgress",PlayerPrefs.GetInt(WoolProgress.ClearedKey,0));
+                SessionState.SetBool("WoolJam.HadLegacy",PlayerPrefs.HasKey(WoolProgress.LegacyKey));
+                SessionState.SetInt("WoolJam.OldLegacy",PlayerPrefs.GetInt(WoolProgress.LegacyKey,0));
                 SessionState.SetBool("WoolJam.Batch",true);
                 EditorApplication.isPlaying=true;
             }
@@ -166,7 +171,7 @@ namespace JamJam.Editor
             foreach(var view in blockViews)
             {
                 var direction=scene.State.Blocks[view.Index].Definition.Direction;
-                var expected=direction==ExitDirection.Up?Vector3.forward:direction==ExitDirection.Down?Vector3.back:direction==ExitDirection.Left?Vector3.left:Vector3.right;
+                WoolShape.Step(direction,out var stepX,out var stepZ);var expected=new Vector3(stepX,0,stepZ);
                 if(Vector3.Dot(view.Arrow.up,expected)<0.99f) throw new InvalidOperationException("Sprite arrow does not match its exit direction");
             }
             File.AppendAllText(Report,"SPRITE ARROW DIRECTIONS PASS\n");
@@ -189,7 +194,7 @@ namespace JamJam.Editor
             for(var i=0;i<30000 && scene.State.Status==RoundStatus.Playing;i++) scene.State.Step(0.02f);
             if(scene.State.Status!=RoundStatus.Lost) throw new InvalidOperationException("Runtime loss failed");
             capture?.Dispose();
-            capture=Observable.Timer(TimeSpan.FromSeconds(0.4f),UnityTimeProvider.Update).Subscribe(_=>
+            capture=Observable.Timer(TimeSpan.FromSeconds(WoolScene.LoseResultDelay+WoolPopIn.DefaultScaleTime),UnityTimeProvider.Update).Subscribe(_=>
             {
                 Capture("loss");
                 scene.ResultRetryButton.onClick.Invoke();
@@ -222,19 +227,37 @@ namespace JamJam.Editor
         [MenuItem("JamJam/Validate All Levels")]
         public static void ValidateLevels()
         {
-            for(var level=1;level<=3;level++)
+            File.AppendAllText(Report,ValidateAllLevels()+"\n");
+        }
+
+        public static string ValidateAllLevels()
+        {
+            var shapes=new HashSet<WoolPathShape>();
+            var count=0;
+            for(var level=1;;level++)
             {
                 var asset=AssetDatabase.LoadAssetAtPath<WoolLevel>(WoolAssetsBuilder.Root+"/Levels/Level_"+level+".asset");
-                var game=new WoolGame(asset.Data);
-                for(var frame=0;frame<30000 && game.Status==RoundStatus.Playing;frame++)
-                {
-                    for(var b=0;b<game.Blocks.Count;b++)
-                        if(game.CanSelect(b) && game.HasVisibleColor(game.Blocks[b].Definition.Color)) { game.Select(b); break; }
-                    game.Step(0.02f);
-                }
-                if(game.Status!=RoundStatus.Won) throw new InvalidOperationException("No verified solution for level "+level);
-                File.AppendAllText(Report,"LEVEL "+level+" SOLUTION PASS / "+game.Total+" units / "+game.Elapsed.ToString("F2")+" s\n");
+                if(asset==null) break;
+                count++;
+                var errors=WoolGame.Validate(asset.Data);
+                if(errors.Count>0) throw new InvalidOperationException("Level "+level+" invalid: "+string.Join("; ",errors));
+                WoolLevelGenerator.Recipe(level,out var recipe);
+                WoolSolver.Run(asset.Data,out var won,out var peak,out var elapsed);
+                if(!won) throw new InvalidOperationException("No verified solution for level "+level);
+                if(Mathf.Abs(peak-recipe.Target)>0.05f) throw new InvalidOperationException("Level "+level+" ratio "+peak.ToString("F3")+" is not within 0.05 of "+recipe.Target.ToString("F2"));
+                var diagonal=false;
+                foreach(var block in asset.Data.Blocks) diagonal|=WoolShape.IsDiagonal(block.Direction);
+                if(level>=9 && !diagonal) throw new InvalidOperationException("Level "+level+" has no diagonal block");
+                WoolPaths.Sample(recipe.Shape,out var path);
+                var same=path.Count==asset.Path.Length;
+                for(var i=0;same && i<path.Count;i++) same=path[i].X==asset.Path[i].x && path[i].Z==asset.Path[i].z && asset.Path[i].y==0;
+                if(!same) throw new InvalidOperationException("Level "+level+" path is not shape "+recipe.Shape);
+                shapes.Add(recipe.Shape);
+                File.AppendAllText(Report,"LEVEL "+level+" SOLUTION PASS / "+asset.Data.Yarn.Length+" units / "+elapsed.ToString("F2")+" s / ratio "+peak.ToString("F3")+"\n");
             }
+            if(count!=WoolLevelGenerator.Count) throw new InvalidOperationException("Expected "+WoolLevelGenerator.Count+" levels but found "+count);
+            if(shapes.Count!=5) throw new InvalidOperationException("Only "+shapes.Count+" dragon path shapes are used");
+            return "VALIDATE PASS / "+count+" levels / 5 path shapes";
         }
 
         static void StartSolver()
@@ -341,7 +364,7 @@ namespace JamJam.Editor
                 if(distance>0 && distance<=block.ExitDistance)
                 {
                     var direction=block.Definition.Direction;
-                    var expected=direction==ExitDirection.Up?Vector3.forward:direction==ExitDirection.Down?Vector3.back:direction==ExitDirection.Left?Vector3.left:Vector3.right;
+                    WoolShape.Step(direction,out var exitX,out var exitZ);var expected=new Vector3(exitX,0,exitZ);
                     var start=WoolScene.BlockPosition(block.Definition,scene.Levels[scene.CurrentLevel].Data);
                     if(Vector3.Distance(view.transform.position,start+expected*distance)>0.001f || Vector3.Dot(view.Arrow.up,expected)<0.99f)
                         throw new InvalidOperationException("Block turned before its initial arrow movement finished");

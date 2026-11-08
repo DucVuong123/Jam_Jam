@@ -1,0 +1,251 @@
+{
+  "tool": "built-in image_gen",
+  "sourceDocument": "wool-ui-art-prompts.md",
+  "assets": [
+    {
+      "file": "Lobby-Background.png",
+      "width": 1080,
+      "height": 2400,
+      "transparent": false,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Portrait mobile game home screen BACKGROUND illustration, exact 9:20 aspect ratio 1080x2400. A cozy sunny knitting workshop by a big round window with blue sky and fluffy clouds outside, giant colorful yarn balls red #E8352F yellow #FFCE1F green #3CC03A cyan #22CFE0 blue #2F74EA pink #F04FAE piled around, cute orange tabby kitten made of knitted wool sitting atop a large yarn ball waving, friendly orange knitted wool dragon peeking behind a knitting basket holding knitting needles, a long rainbow yarn strand looping across scene. Warm cheerful lighting, soft depth of field. Character cluster restricted to y=20%-65% of canvas. Keep TOP 18% calm plain soft sky and BOTTOM 30% calm uncluttered wooden floor for UI overlay. Full bleed opaque background. NO interface elements, NO buttons, NO text or letters or logo."
+    },
+    {
+      "file": "Logo-WoolJam.png",
+      "width": 1200,
+      "height": 600,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Game logo, exact words \"WOOL JAM\", spelled W-O-O-L space J-A-M, one horizontal line, target 1200x600 aspect ratio 2:1. Seven big chunky bubbly letters made of knitted wool with clearly visible stitches. Letters alternate red yellow green cyan blue pink, thick dark navy outline, glossy highlights. Small yarn ball with needle as a tiny accent above words, cute orange kitten paw peeking over J. Slight playful tilt while keeping text easy to read. Transparent background, entire logo uncropped with 7% safety margin. Text allowed ONLY exact words WOOL JAM. No other text, extra letters, subtitle, border, or mockup."
+    },
+    {
+      "file": "Button-Green.png",
+      "width": 512,
+      "height": 192,
+      "transparent": true,
+      "prompt": "Use case: precise-object-edit. Input image is edit target. Keep the same glossy green button shape, green face, highlight, knitted stitch border, dark green bottom lip and dark navy outline. REMOVE BOTH white flowers and ALL leaves, leave smooth green empty areas instead. REMOVE ALL navy background glow and ALL outside shadows; pixels outside the button's hard navy outline must be fully transparent, including corners. No floral decorations, no leaves, no yarn balls, no icons, no text. Exact wide 8:3 canvas, 512x192. One simple clean stretchable 9-slice button, smooth uniform center. Transparent background."
+    },
+    {
+      "file": "Levels-Background.png",
+      "width": 1080,
+      "height": 2400,
+      "transparent": false,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Portrait mobile game LEVEL MAP BACKGROUND 1080x2400, exact 9:20 portrait aspect ratio, full bleed opaque. A winding knitted yarn path of chunky stitches curving from bottom to top over cozy felt patchwork quilt landscape, MUTED low contrast navy #14234A and teal tones. Small decorative yarn balls, buttons and knitting needles scattered ONLY at far edges. Gentle vignette. Plenty of calm empty space in central 65% width for level cards, low-contrast curving path may peek at edges. No characters, no UI cards, no text, no letters, no numbers, no icons. Same wool-world style as reference but darker calm palette."
+    },
+    {
+      "file": "Button-Cream.png",
+      "width": 512,
+      "height": 192,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Input is shape/style reference. Create same single empty wide 8:3 pill game button 512x192, replace green face with warm cream #FFF3D6 and bottom lip with #D9B77A. Soft white highlight band top third, thick dark navy #0E1836 outline, subtle stitch line inside edge. For 9-slice: flat uniform center 65% width, smooth horizontal edges; same cap geometry. No flowers leaves yarn balls icons or text. Truly transparent outside outline, no outside glow, no ground shadow, no background gradient."
+    },
+    {
+      "file": "Button-Orange.png",
+      "width": 512,
+      "height": 192,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Input is shape/style reference. Create same single empty wide 8:3 pill game button 512x192, replace green face with orange-yellow #FFB21F and bottom lip #C77A0A. Soft white highlight band top third, thick dark navy #0E1836 outline, subtle stitch line inside edge. For 9-slice: flat uniform center 65% width, smooth horizontal edges; same cap geometry. No flowers leaves yarn balls icons or text. Truly transparent outside outline, no outside glow, no ground shadow, no background gradient."
+    },
+    {
+      "file": "Button-Red.png",
+      "width": 512,
+      "height": 192,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Input is shape/style reference. Create same single empty wide 8:3 pill game button 512x192, replace green face with orange-red #F0603A and bottom lip darker burnt orange-red. Soft white highlight band top third, thick dark navy #0E1836 outline, subtle stitch line inside edge. For 9-slice: flat uniform center 65% width, smooth horizontal edges; same cap geometry. No flowers leaves yarn balls icons or text. Truly transparent outside outline, no outside glow, no ground shadow, no background gradient."
+    },
+    {
+      "file": "Button-Round-Orange.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One empty ROUND mobile game button, perfect CIRCLE frontal orthographic view, square 256x256 canvas. Glossy orange-yellow #FFB21F face, white highlight top LEFT, thick darker #C77A0A extruded bottom lip, thick clean dark navy #0E1836 outline. No stitch decorations inside center. No icon, no text, no letters, no flowers, no yarn balls. Centered entire button within 8% transparent margin. Transparent background outside silhouette, no backdrop gradient or external glow, no cast shadow."
+    },
+    {
+      "file": "Button-Round-Cream.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One empty ROUND mobile game button, perfect CIRCLE frontal orthographic view, square 256x256 canvas. Glossy warm cream #FFF3D6 face, white highlight top LEFT, thick darker #D9B77A extruded bottom lip, thick clean dark navy #0E1836 outline. No stitch decorations inside center. No icon, no text, no letters, no flowers, no yarn balls. Centered entire button within 8% transparent margin. Transparent background outside silhouette, no backdrop gradient or external glow, no cast shadow."
+    },
+    {
+      "file": "Panel-Card.png",
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One EMPTY popup card panel, square rounded rectangle 1024x1024 with 64px corner radius. Warm cream #FFF8EC flat even center, thick dark navy #0E1836 outer border, inner border of white running stitches like quilted fabric patch, subtle darker cream bottom lip. SMALL orange and cream yarn ball decorations ONLY at TWO TOP CORNERS. Front orthographic view. Center 75% width and height fully empty uniform flat cream for text and 9-slice stretching. Keep edges straight, corners self contained. No text, letters, numbers or center icons. Entire panel uncropped with 5% transparent margin, transparent background, no backdrop, no cast shadow."
+    },
+    {
+      "file": "Banner-Ribbon-Green.png",
+      "width": 1024,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single EMPTY title ribbon banner, horizontal exact 4:1 aspect ratio, target 1024x256. Glossy bright green #3CC03A fabric front band, folded darker green tail ends on BOTH sides, fishtail cuts at ends, white stitched edge, thick dark navy #0E1836 outline. Front view, symmetric. Straight flat even smooth middle 60% width for text and horizontal 9-slice stretching, all folds confined to side caps. No text, letters numbers icons flowers or extra objects. Entire silhouette within 4% transparent margin. Transparent background, no cast shadow or backdrop glow."
+    },
+    {
+      "file": "Banner-Ribbon-Red.png",
+      "width": 1024,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single EMPTY title ribbon banner, horizontal exact 4:1 aspect ratio, target 1024x256. Glossy orange-red #F0603A fabric front band, folded darker burnt orange-red tail ends on BOTH sides, fishtail cuts at ends, white stitched edge, thick dark navy #0E1836 outline. Front view, symmetric. Straight flat even smooth middle 60% width for text and horizontal 9-slice stretching, all folds confined to side caps. No text, letters numbers icons flowers or extra objects. Entire silhouette within 4% transparent margin. Transparent background, no cast shadow or backdrop glow."
+    },
+    {
+      "file": "Badge-Level.png",
+      "width": 384,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single EMPTY rounded badge plate, horizontal 3:2 aspect ratio, 384x256. Glossy orange-yellow #FFB21F front, thick darker #C77A0A bottom lip, thick dark navy outline #0E1836. A SMALL knitted orange yarn ball attached ONLY at TOP LEFT CORNER. All other edges and center smooth and empty, flat even middle for game-rendered level number and 9-slice stretching. Front orthographic view, 6% transparent margin around complete silhouette. No text, letters, numbers or center symbol. Transparent background, no ground, no cast shadow, no external glow."
+    },
+    {
+      "file": "Progress-Fill.png",
+      "width": 1024,
+      "height": 96,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One horizontal progress bar FILL sprite, very long thin capsule aspect ratio 32:3 target 1024x96. If canvas cannot be this wide, put the 32:3 shaped asset in center and leave transparent vertical padding. Capsule of twisted bright green #3CC03A knitted yarn with clear stitches, glossy thin highlight along top, darker green #23862A bottom edge. Uniform horizontally repeating knit texture across center for stretching; rounded closed end caps. Entire capsule uncut. Transparent background. No track, frame, knob, icons, text, letters, numbers, external glow or ground shadow."
+    },
+    {
+      "file": "Progress-Track.png",
+      "width": 1024,
+      "height": 96,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One EMPTY horizontal progress bar TRACK, very long thin capsule aspect ratio 32:3 target 1024x96. If canvas cannot be this wide, put the 32:3 shaped asset in center and leave transparent vertical padding. Deep navy #0E1836 capsule with subtle inner shadow, thin light cream stitched line along inside edge. Uniform straight horizontal middle, round end caps, smooth flat center for 9-slice stretching. Entire capsule uncut. Transparent background. No fill, green, knob, icons, labels, text, letters, numbers, external glow or background shadow."
+    },
+    {
+      "file": "Result-Rays.png",
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Flat luminous radial sunburst VFX sprite 1024x1024, center exactly image center. SIXTEEN individual thin soft cream-yellow triangular light rays, equal length, precisely equally spaced every 22.5 degrees around center: 0,22.5,45,67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5. Each ray is separated by a clearly transparent wedge. Soft glowing center, rays fade to transparent at tips, all inside circular 90% canvas diameter. This is purely a two-dimensional translucent LIGHT EFFECT, no object material, no navy outlines, no bevel or rounded petals, no wool texture. Background and gaps ACTUAL TRANSPARENT, no background disk, no text, no symbols, no watermark."
+    },
+    {
+      "file": "Icon-Pause.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of two thick rounded vertical pause bars, equal height and width with clear gap; bars only. Square 256x256. Glossy cream white #FFF3D6 fill with subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is MATERIAL AND COLOR reference only, DO NOT include its circular button plate. Icon by itself, no enclosing disk, no button, no tile or badge. Centered with 10% transparent margin; small-size readable silhouette, top-left highlights, no external glow or ground shadow, no text letters numbers watermark. True transparent background."
+    },
+    {
+      "file": "Icon-Play.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one thick rounded play triangle pointing RIGHT; triangle only. Square 256x256. Glossy cream white #FFF3D6 fill with subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is MATERIAL AND COLOR reference only, DO NOT include its circular button plate. Icon by itself, no enclosing disk, no button, no tile or badge. Centered with 10% transparent margin; small-size readable silhouette, top-left highlights, no external glow or ground shadow, no text letters numbers watermark. True transparent background."
+    },
+    {
+      "file": "Icon-Settings.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one chunky gear with exactly SIX rounded teeth and a circular transparent center hole. Square 256x256. Glossy cream white #FFF3D6 fill with subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is MATERIAL AND COLOR reference only, DO NOT include its circular button plate. Icon by itself, no enclosing disk, no button, no tile or badge. Centered with 10% transparent margin; small-size readable silhouette, top-left highlights, no external glow or ground shadow, no text letters numbers watermark. True transparent background."
+    },
+    {
+      "file": "Icon-Home.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of a cute little house with a round door and a tiny orange yarn ball chimney. Square 256x256. Glossy cream white #FFF3D6 fill with subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is MATERIAL AND COLOR reference only, DO NOT include its circular button plate. Icon by itself, no enclosing disk, no button, no tile or badge. Centered with 10% transparent margin; small-size readable silhouette, top-left highlights, no external glow or ground shadow, no text letters numbers watermark. True transparent background."
+    },
+    {
+      "file": "Icon-Retry.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one thick circular arrow looping CLOCKWISE, with a large clear triangular arrowhead and transparent open center. Square 256x256. Glossy cream white #FFF3D6 fill except specified gold lock body, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is style only. Centered with 10% transparent margin, clear readable silhouette. No enclosing circle plate, no button, no tile, no flowers, no extra decorations or objects, no text letters numbers. Transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-Back.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one thick rounded arrow pointing LEFT, short horizontal shaft and broad left-pointing arrowhead. Square 256x256. Glossy cream white #FFF3D6 fill except specified gold lock body, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is style only. Centered with 10% transparent margin, clear readable silhouette. No enclosing circle plate, no button, no tile, no flowers, no extra decorations or objects, no text letters numbers. Transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-Lock.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one chunky padlock with golden yellow #FFB21F body, cream shackle, a simple dark keyhole in the middle. Square 256x256. Glossy cream white #FFF3D6 fill except specified gold lock body, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is style only. Centered with 10% transparent margin, clear readable silhouette. No enclosing circle plate, no button, no tile, no flowers, no extra decorations or objects, no text letters numbers. Transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-Check.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one thick bold check mark, bright green #3CC03A fill, no enclosing circle. Square 256x256. Glossy cream #FFF3D6 fill except specified green check, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel, subtle wool accent. Reference is material and outline style only. Centered with 10% transparent margin, bold readable silhouette. No enclosing button, badge or tile, no flowers, no extra objects, no letters text numbers. True transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-Music.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one double music note with two rounded note heads joined by one thick beam, cream white fill. Square 256x256. Glossy cream #FFF3D6 fill except specified green check, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel, subtle wool accent. Reference is material and outline style only. Centered with 10% transparent margin, bold readable silhouette. No enclosing button, badge or tile, no flowers, no extra objects, no letters text numbers. True transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-Vibration.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one upright smartphone, cream frame, navy screen with no content, and two small cream zigzag shake lines on EACH side. Square 256x256. Glossy cream white #FFF3D6 fill unless other fill specified, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is style only; do NOT copy triangle shape. Centered with 10% transparent margin, clear readable silhouette. No enclosing circle, no button tile or badge, no flowers, no extra objects, no letters text numbers. True transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-YarnBall.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Single standalone game ICON of one round ball of orange knitted yarn with visible crossing strands and ONE short loose strand curling to the right, orange fill. Square 256x256. Glossy cream white #FFF3D6 fill unless other fill specified, subtle inner shadow, thick dark navy #0E1836 outline, slight chunky 3D bevel. Reference is style only; do NOT copy triangle shape. Centered with 10% transparent margin, clear readable silhouette. No enclosing circle, no button tile or badge, no flowers, no extra objects, no letters text numbers. True transparent background, no external glow or cast shadow."
+    },
+    {
+      "file": "Icon-Star.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Precise edit of input star sprite. Change ONLY the interior star fill from pale cream to vibrant saturated GOLDEN YELLOW #FFB21F, rich gold body, darker golden orange lower bevel #C77A0A. Keep five point silhouette, wool texture, thick navy outline, top-left WHITE specular highlights, exact framing and transparent background. The star must look deeply golden yellow, NOT white or cream. No face, no letters, no other objects. 256x256 target. Transparent background."
+    },
+    {
+      "file": "Icon-Sound.png",
+      "width": 256,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Replace input symbol with a proper conventional VOLUME SPEAKER icon: on the LEFT a short rounded rectangular speaker cabinet joined to a flared trapezoid loudspeaker cone that WIDENS toward the RIGHT; cone ends in a VERTICAL broad right edge, NOT a triangle point. To the RIGHT exactly two curved sound-wave arcs. One cream #FFF3D6 icon with thick dark navy #0E1836 outline, glossy rounded chunky bevel and subtle knitted surface, top-left highlights. Square 256x256, 10% transparent margin, no background plate, no circle, no text or letters. Transparent background, no cast shadow. Only speaker and two waves."
+    },
+    {
+      "file": "LevelCard-Cleared.png",
+      "width": 1024,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One EMPTY wide level card plate, horizontal 4:1 aspect ratio 1024x256, rounded rectangle with moderate corner radius (not pill). Look: glossy bright green #3CC03A with darker green #23862A bottom lip; a few TINY gold stars confined only at the far RIGHT END. Thick navy #0E1836 outline, white stitched inner edge. Uniform smooth empty central 65% width for game-rendered text; all decoration at end caps only for horizontal 9-slice stretching, straight horizontal edges. Front orthographic view. Entire card with 4% transparent safety margin, no text letters numbers, no other symbols or extra objects. Transparent background, no cast shadow."
+    },
+    {
+      "file": "LevelCard-Current.png",
+      "width": 1024,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One EMPTY wide level card plate, horizontal 4:1 aspect ratio 1024x256, rounded rectangle with moderate corner radius (not pill). Look: glossy orange-yellow #FFB21F with darker #C77A0A bottom lip, subtle soft outer glow and ONE small orange knitted yarn ball confined only at far LEFT END. Thick navy #0E1836 outline, white stitched inner edge. Uniform smooth empty central 65% width for game-rendered text; all decoration at end caps only for horizontal 9-slice stretching, straight horizontal edges. Front orthographic view. Entire card with 4% transparent safety margin, no text letters numbers, no other symbols or extra objects. Transparent background, no cast shadow."
+    },
+    {
+      "file": "LevelCard-Locked.png",
+      "width": 1024,
+      "height": 256,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. One EMPTY wide level card plate, horizontal 4:1 aspect ratio 1024x256, rounded rectangle with moderate corner radius (not pill). Look: matte dusty navy #2A3A66, slightly darker navy bottom lip, subtle felt texture, NO icons or decorations. Thick navy #0E1836 outline, white stitched inner edge. Uniform smooth empty central 65% width for game-rendered text; all decoration at end caps only for horizontal 9-slice stretching, straight horizontal edges. Front orthographic view. Entire card with 4% transparent safety margin, no text letters numbers, no other symbols or extra objects. Transparent background, no cast shadow."
+    },
+    {
+      "file": "Result-Win-Characters.png",
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Character references: image1 exact kitten identity, image2 exact dragon head identity. Create a cute chibi orange tabby wool kitten and friendly orange knitted wool dragon HUGGING and jumping with joy, colorful tiny yarn confetti floating close around them. Full bodies, visible knit stitches, large expressive happy eyes, cream muzzle belly paws and dragon horns, saturated warm colors. Dragon has small chibi body with cream belly, little wings and tail, same friendly orange head. One cohesive celebratory duo, centered 1024x1024, complete silhouette inside 8% transparent margin. No UI plate, no banner, no text, no floor, no cast shadow. Actual transparent background."
+    },
+    {
+      "file": "Result-Lose-Kitten.png",
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Input is definitive SAME KITTEN identity reference. Create ONLY this cute orange tabby wool kitten sitting alone looking sad, gently hugging one tangled ball of orange yarn with loose strands at its feet, one small tear by eye. Preserve exact character facial proportions tabby markings cream muzzle chest paws curled tail and wool stitches. Full body centered 1024x1024 with 8% transparent margin, big glossy sad eyes, ears slightly lowered, soft top-left studio light, warm colors. NO DRAGON, no other characters. No UI card, no text, no floor, no cast shadow, actual transparent background."
+    },
+    {
+      "file": "Lobby-Characters.png",
+      "width": 1024,
+      "height": 1024,
+      "transparent": true,
+      "prompt": "Casual mobile puzzle game UI asset, glossy cartoon 3D style like polished match puzzle games, soft knitted wool and felt texture accents, chunky rounded shapes, thick dark navy outline (#0E1836), soft top-left studio lighting with a bright highlight on top and a darker bottom lip, vibrant saturated colors, clean edges, high detail, centered. No watermark. Character references: image1 exact kitten identity, image2 exact dragon head identity. Cute chibi orange tabby knitted wool kitten and friendly orange wool dragon STANDING SIDE BY SIDE WAVING HELLO at viewer, one raised front paw each. Complete full bodies, big glossy friendly eyes, kitten cream muzzle chest belly paws and distinct orange tabby stripes; dragon cream horns and belly, golden felt spikes, tiny wings and tail. Soft top-left studio light, visible knit stitches, warm saturated palette. Duo centered in square 1024x1024, all ears horns paws tails inside 8% transparent margin. No other objects, no UI, no floor, no cast shadow, no text, actual transparent background."
+    }
+  ]
+}

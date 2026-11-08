@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using R3;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace JamJam
@@ -11,6 +12,7 @@ namespace JamJam
         public WoolArt Art;
         public WoolLevel[] Levels;
         public Transform World;
+        public Transform Cushion;
         public Text LevelNumber;
         public Text ProgressNumber;
         public Image ProgressFill;
@@ -23,38 +25,130 @@ namespace JamJam
         public Button RetryButton;
         public Button ResultRetryButton;
         public Button NextButton;
+        public Button[] HomeButtons;
+        public GameObject ResultRays;
+        public Button SpeedButton;
+        public Text SpeedLabel;
+        public Button UnlockTemplate;
         public WoolGame State;
+        public static int Speed { get; private set; } = 1;
+        public const float StepLimit = 0.1f;
+        public const float UnlockDisabledAlpha = 0.5f;
+        public static readonly Vector3 UnlockOffset = new Vector3(0, 0, -0.75f);
         public int CurrentLevel { get; private set; }
+        public const float WinResultDelay = 0.9f;
+        public const float LoseResultDelay = 0.6f;
+        public bool ResultPending => resultDelay != null;
+        public double ResultQueuedAt { get; private set; }
+        WoolProgress progress;
+        bool leaving;
         readonly List<WoolBlockView> blockViews = new List<WoolBlockView>();
         readonly List<Transform> units = new List<Transform>();
         readonly List<Transform> spoolViews = new List<Transform>();
         readonly List<TextMesh> spoolLabels = new List<TextMesh>();
+        readonly List<TextMesh> spoolShadows = new List<TextMesh>();
         readonly List<LineRenderer> threads = new List<LineRenderer>();
+        readonly List<Vector3> threadEnds = new List<Vector3>();
+        readonly List<int> threadTargets = new List<int>();
         readonly List<WoolSlotView> slots = new List<WoolSlotView>();
+        readonly List<Button> unlockButtons = new List<Button>();
+        readonly List<CanvasGroup> unlockGroups = new List<CanvasGroup>();
         readonly List<Transform> confetti = new List<Transform>();
         readonly List<Vector3> confettiVelocity = new List<Vector3>();
         readonly List<float> pathDistances = new List<float>();
         readonly List<Mesh> roadMeshes = new List<Mesh>();
+        readonly List<float> blockFlashShown = new List<float>();
+        readonly List<float> slotFlashShown = new List<float>();
+        static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        MaterialPropertyBlock blockTint;
+        WoolFeel feel;
         IDisposable clock;
+        IDisposable resultDelay;
         Transform dragon;
         Transform kitten;
         Transform kittenBody;
         Camera gameCamera;
+        float fittedAspect;
+        float fittedSize;
+        Vector3 fittedPosition;
+        Quaternion fittedRotation = Quaternion.identity;
         Vector3 kittenRest;
         RoundStatus lastStatus;
         double lastTime;
         float celebration;
         float displayedHead;
-        const float Cell = 1f;
+        public const float CushionPad = 0.5f;
+        const float ThreadStartWidth = 0.2f;
+        const float ThreadEndWidth = 0.15f;
+
+        public float CameraFitAspect => fittedAspect;
+
+        public void FitCamera()
+        {
+            if (gameCamera == null) return;
+            var aspect = gameCamera.aspect;
+            var rotation = Quaternion.Euler(WoolStage.Pitch, 0, 0);
+            var position = new Vector3(0, 0, WoolStage.TargetZ) - rotation * Vector3.forward * WoolStage.Distance;
+            var size = WoolStage.Size(aspect);
+            fittedAspect = aspect;
+            fittedPosition = position;
+            fittedRotation = rotation;
+            fittedSize = size;
+            if (feel != null) feel.Rebase(position, rotation, size);
+            else { gameCamera.transform.SetPositionAndRotation(position, rotation); gameCamera.orthographicSize = size; }
+            PlaceUnlockButtons();
+        }
+
+        void PlaceUnlockButtons()
+        {
+            if (gameCamera == null || fittedSize <= 0 || fittedAspect <= 0) return;
+            var pixels = gameCamera.pixelRect;
+            var inverse = Quaternion.Inverse(fittedRotation);
+            for (var i = 0; i < unlockButtons.Count; i++)
+            {
+                var rect = (RectTransform)unlockButtons[i].transform;
+                var parent = rect.parent as RectTransform;
+                if (parent == null) continue;
+                var view = inverse * (SlotPosition(i) + UnlockOffset - fittedPosition);
+                var screen = new Vector2(pixels.x + (0.5f + view.x / (2 * fittedSize * fittedAspect)) * pixels.width, pixels.y + (0.5f + view.y / (2 * fittedSize)) * pixels.height);
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, screen, null, out var local)) rect.localPosition = new Vector3(local.x, local.y, 0);
+            }
+        }
+
+        public void ToggleSpeed()
+        {
+            Speed = Speed == 1 ? 2 : 1;
+            ShowSpeed();
+        }
+
+        public static void ResetSpeed() { Speed = 1; }
+
+        void ShowSpeed()
+        {
+            if (SpeedLabel != null) SpeedLabel.text = "x" + Speed;
+        }
+
+        public void UnlockButton(int slot, out Button button)
+        {
+            button = slot >= 0 && slot < unlockButtons.Count ? unlockButtons[slot] : null;
+        }
 
         void Start()
         {
+            progress = new WoolProgress(new WoolPlayerPrefs(), Levels.Length);
+            if (SpeedButton != null) SpeedButton.onClick.AddListener(ToggleSpeed);
+            ShowSpeed();
             PauseButton.onClick.AddListener(Pause);
             ResumeButton.onClick.AddListener(Resume);
             RetryButton.onClick.AddListener(Replay);
             ResultRetryButton.onClick.AddListener(Replay);
             NextButton.onClick.AddListener(Next);
-            LoadLevel(Mathf.Clamp(PlayerPrefs.GetInt("JamJam.Level", 0), 0, Levels.Length - 1));
+            if (HomeButtons != null)
+                foreach (var button in HomeButtons)
+                    if (button != null) button.onClick.AddListener(Home);
+            var selected = WoolSession.SelectedLevel;
+            WoolSession.Clear();
+            LoadLevel(selected >= 0 ? selected : progress.Current);
         }
 
         void OnEnable()
@@ -64,9 +158,10 @@ namespace JamJam
             clock = Observable.Interval(TimeSpan.FromSeconds(1d / 60d), UnityTimeProvider.Update).Subscribe(_ => Tick());
         }
 
-        void OnDisable() { clock?.Dispose(); clock = null; }
+        void OnDisable() { clock?.Dispose(); clock = null; CancelResult(); }
         void OnDestroy()
         {
+            CancelResult();
             foreach(var mesh in roadMeshes) if(mesh!=null) Destroy(mesh);
             roadMeshes.Clear();
         }
@@ -75,14 +170,23 @@ namespace JamJam
         {
             clock?.Dispose();
             clock = null;
+            CancelResult();
             foreach (Transform child in World) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             foreach(var mesh in roadMeshes) Destroy(mesh);
             roadMeshes.Clear();
-            blockViews.Clear(); units.Clear(); spoolViews.Clear(); spoolLabels.Clear(); threads.Clear(); slots.Clear(); confetti.Clear(); confettiVelocity.Clear();
+            blockViews.Clear(); units.Clear(); spoolViews.Clear(); spoolLabels.Clear(); threads.Clear(); threadEnds.Clear(); threadTargets.Clear(); slots.Clear(); confetti.Clear(); confettiVelocity.Clear();
+            spoolShadows.Clear();
+            blockFlashShown.Clear(); slotFlashShown.Clear();
             CurrentLevel = Mathf.Clamp(index, 0, Levels.Length - 1);
             var level = Levels[CurrentLevel];
             gameCamera=Camera.main;
             State = new WoolGame(level.Data);
+            if (feel == null) feel = gameObject.AddComponent<WoolFeel>();
+            feel.Begin(this, gameCamera);
+            feel.Restart(State);
+            BuildUnlockButtons();
+            ShowSpeed();
+            FitCamera();
             displayedHead = State.Head;
             pathDistances.Clear(); pathDistances.Add(0);
             for (var i = 1; i < level.Path.Length; i++) pathDistances.Add(pathDistances[i - 1] + Vector3.Distance(level.Path[i - 1], level.Path[i]));
@@ -91,6 +195,8 @@ namespace JamJam
             celebration = 0;
             LevelNumber.text = (CurrentLevel + 1).ToString("00");
             BuildRoad(level.Path);
+            if (Cushion != null) Cushion.localScale = new Vector3(level.Data.Columns * WoolRouting.CellSize + CushionPad, Cushion.localScale.y, level.Data.Rows * WoolRouting.CellSize + CushionPad);
+            if (Cushion != null) Cushion.position = new Vector3(Cushion.position.x, Cushion.position.y, WoolRouting.BoardCenterZ);
             for (var i = 0; i < State.Blocks.Count; i++)
             {
                 var data = State.Blocks[i].Definition;
@@ -98,36 +204,44 @@ namespace JamJam
                 go.name = "Block_" + i;
                 var view = go.GetComponent<WoolBlockView>();
                 view.Owner = this; view.Index = i;
-                var body=view.Body.GetComponent<SpriteRenderer>();
-                body.size=new Vector2(data.Width*Cell+0.02f,data.Height*Cell+0.02f);
-                var color=Art.Yarn[data.Color].GetColor("_BaseColor");
-                Color.RGBToHSV(color,out var hue,out var saturation,out var value);
-                body.color=Color.HSVToRGB(hue,Mathf.Min(1,saturation*1.25f),Mathf.Min(1,value*1.12f));
-                var vertical=data.Direction==ExitDirection.Up || data.Direction==ExitDirection.Down;
-                view.Arrow.localRotation=Quaternion.Euler(90,0,0)*Quaternion.Euler(0,0,-(int)data.Direction*90);
-                view.Arrow.localScale=new Vector3(0.56f,(vertical?data.Height:data.Width)*Cell*0.78f,1);
+                WoolBlockMesh.Get(data.Width, data.Height, out var bodyMesh);
+                view.Body.GetComponent<MeshFilter>().sharedMesh = bodyMesh;
+                blockTint ??= new MaterialPropertyBlock();
+                blockTint.SetColor(BaseColor, Art.Yarn[data.Color].GetColor(BaseColor));
+                view.Body.GetComponent<Renderer>().SetPropertyBlock(blockTint);
+                var quarter=WoolShape.ArrowQuarter(data.Direction);
+                var vertical=quarter%2==0;
+                view.Arrow.localRotation=Quaternion.Euler(90,0,0)*Quaternion.Euler(0,0,-quarter*90);
+                view.Arrow.localScale=new Vector3(0.56f*WoolRouting.CellSize,(vertical?data.Height:data.Width)*WoolRouting.CellSize*0.78f,1);
                 var collider = go.GetComponent<BoxCollider>();
-                collider.size = new Vector3(data.Width * Cell - 0.035f, 0.55f, data.Height * Cell - 0.035f);
-                collider.center = new Vector3(0, 0.28f, 0);
-                go.transform.position = BlockPosition(data, level.Data);
+                collider.size = new Vector3((data.Width - WoolBlockMesh.Inset * 2) * WoolRouting.CellSize, WoolBlockMesh.Thickness + 0.2f, (data.Height - WoolBlockMesh.Inset * 2) * WoolRouting.CellSize);
+                collider.center = new Vector3(0, (WoolBlockMesh.Thickness + 0.2f) * 0.5f, 0);
+                go.transform.SetPositionAndRotation(BlockPosition(data, level.Data), Quaternion.Euler(0, WoolShape.RestYaw(data.Direction), 0));
                 blockViews.Add(view);
+                blockFlashShown.Add(0);
             }
             for (var i = 0; i < State.Spools.Count; i++)
             {
                 var slot = Instantiate(Art.Slot, World).GetComponent<WoolSlotView>();
                 slot.transform.position = SlotPosition(i); slot.Owner = this; slot.Index = i;
                 slots.Add(slot);
+                slotFlashShown.Add(0);
                 var spool = Instantiate(Art.Spool, World).transform;
                 spool.position = SlotPosition(i) + Vector3.up * 0.33f;
                 spoolViews.Add(spool);
-                spoolLabels.Add(spool.GetComponentInChildren<TextMesh>());
+                var label = spool.GetComponentInChildren<TextMesh>();
+                spoolLabels.Add(label);
+                var shadow = label.transform.Find("Shadow");
+                spoolShadows.Add(shadow != null ? shadow.GetComponent<TextMesh>() : null);
                 var lineObject = new GameObject("Thread_" + i);
                 lineObject.transform.SetParent(World, false);
                 var line = lineObject.AddComponent<LineRenderer>();
-                line.positionCount = 20; line.startWidth = 0.045f; line.endWidth = 0.025f;
+                line.positionCount = 20; line.startWidth = ThreadStartWidth; line.endWidth = ThreadEndWidth; line.textureMode = LineTextureMode.Tile;
                 line.numCapVertices = 3; line.numCornerVertices = 3; line.generateLightingData = true;
                 line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 threads.Add(line);
+                threadEnds.Add(Vector3.zero);
+                threadTargets.Add(-1);
             }
             for (var i = 0; i < State.Yarn.Count; i++)
             {
@@ -149,48 +263,126 @@ namespace JamJam
             RenderFrame(0);
         }
 
+        void BuildUnlockButtons()
+        {
+            foreach (var button in unlockButtons)
+                if (button != null) { button.gameObject.SetActive(false); Destroy(button.gameObject); }
+            unlockButtons.Clear();
+            unlockGroups.Clear();
+            if (UnlockTemplate == null) return;
+            var template = UnlockTemplate.transform;
+            for (var i = 0; i < State.Spools.Count; i++)
+            {
+                var button = Instantiate(UnlockTemplate, template.parent);
+                button.name = "Unlock_" + i;
+                button.transform.SetSiblingIndex(template.GetSiblingIndex() + 1 + i);
+                var slot = i;
+                button.onClick.AddListener(() => UnlockAt(slot));
+                var group = button.GetComponent<CanvasGroup>();
+                if (group == null) group = button.gameObject.AddComponent<CanvasGroup>();
+                unlockButtons.Add(button);
+                unlockGroups.Add(group);
+            }
+        }
+
         public void Select(int index)
         {
             if (State == null || State.Paused || State.Status != RoundStatus.Playing) return;
-            if (!State.Select(index) && index >= 0 && index < blockViews.Count) blockViews[index].Shake = 0.35f;
+            if (State.Select(index) || index < 0 || index >= blockViews.Count) return;
+            blockViews[index].Shake = 0.35f;
+            if (State.Blocks[index].Phase == 0) feel.Blocked(index);
         }
 
-        public void Unlock() { if (State != null) State.UnlockSlot(); }
-        public void Pause() { if (State == null || State.Status != RoundStatus.Playing) return; State.SetPaused(true); PausePanel.SetActive(true); }
-        public void Resume() { if (State == null) return; State.SetPaused(false); PausePanel.SetActive(false); lastTime = Time.timeAsDouble; }
+        public Vector3 BlockAt(int index) { return index >= 0 && index < blockViews.Count ? blockViews[index].transform.position : kittenRest; }
+        public Vector3 UnitAt(int index) { return index >= 0 && index < units.Count ? units[index].position : kittenRest; }
+        public Vector3 KittenAt => kittenRest;
+        public bool ThreadVisible(int slot) { return slot >= 0 && slot < threads.Count && threads[slot] != null && threads[slot].enabled; }
+        public Vector3 ThreadEnd(int slot) { return slot >= 0 && slot < threadEnds.Count ? threadEnds[slot] : kittenRest; }
+
+        public void Unlock() { if (State == null || State.Paused) return; State.UnlockSlot(); }
+        public void UnlockAt(int slot) { if (State != null && slot == State.OpenSlots) Unlock(); }
+        public void Pause() { if (State == null || State.Status != RoundStatus.Playing) return; State.SetPaused(true); feel.SetPaused(true); PausePanel.SetActive(true); }
+        public void Resume() { if (State == null) return; State.SetPaused(false); feel.SetPaused(false); PausePanel.SetActive(false); lastTime = Time.timeAsDouble; }
         public void Replay() { LoadLevel(CurrentLevel); }
-        public void Next() { if (State != null && State.Status == RoundStatus.Won) LoadLevel((CurrentLevel + 1) % Levels.Length); }
+        public void Next()
+        {
+            if (State == null || State.Status != RoundStatus.Won) return;
+            if (CurrentLevel >= Levels.Length - 1) Home(); else LoadLevel(CurrentLevel + 1);
+        }
+        public void Home() { if (leaving) return; leaving = true; clock?.Dispose(); clock = null; CancelResult(); SceneManager.LoadScene(WoolSession.LobbyScene); }
 
         void Tick()
         {
             var now = Time.timeAsDouble;
-            var delta = Mathf.Clamp((float)(now - lastTime), 0, 0.1f);
+            var delta = Mathf.Clamp((float)(now - lastTime), 0, StepLimit);
             lastTime = now;
+            if (gameCamera != null && Mathf.Abs(gameCamera.aspect - fittedAspect) > 1e-4f) FitCamera();
             if (State == null || State.Paused) return;
-            State.Step(delta);
-            RenderFrame(delta);
+            var scaled = delta * Speed;
+            var steps = Mathf.Max(1, Mathf.CeilToInt(scaled / StepLimit - 1e-4f));
+            for (var s = 0; s < steps; s++) State.Step(scaled / steps);
+            feel.Step(State, scaled);
+            RenderFrame(scaled);
             if (State.Status != lastStatus)
             {
                 lastStatus = State.Status;
-                ResultPanel.SetActive(true);
-                WonContent.SetActive(State.Status == RoundStatus.Won);
-                LostContent.SetActive(State.Status == RoundStatus.Lost);
-                NextButton.gameObject.SetActive(State.Status == RoundStatus.Won);
+                QueueResult(State.Status);
                 if (State.Status == RoundStatus.Won)
                 {
-                    PlayerPrefs.SetInt("JamJam.Level", Mathf.Min(CurrentLevel + 1, Levels.Length - 1));
-                    PlayerPrefs.Save();
+                    progress.MarkCleared(CurrentLevel);
                     Burst();
                 }
             }
         }
 
+        void QueueResult(RoundStatus status)
+        {
+            CancelResult();
+            ResultQueuedAt = Time.timeAsDouble;
+            var delay = status == RoundStatus.Won ? WinResultDelay : LoseResultDelay;
+            resultDelay = Observable.Timer(TimeSpan.FromSeconds(delay), UnityTimeProvider.Update).Subscribe(_ => ShowResult(status));
+        }
+
+        void ShowResult(RoundStatus status)
+        {
+            CancelResult();
+            ResultPanel.SetActive(true);
+            WonContent.SetActive(status == RoundStatus.Won);
+            LostContent.SetActive(status == RoundStatus.Lost);
+            NextButton.gameObject.SetActive(status == RoundStatus.Won);
+            if (ResultRays != null) ResultRays.SetActive(status == RoundStatus.Won);
+        }
+
+        public void ShowProgress(float fill)
+        {
+            fill = Mathf.Clamp01(fill);
+            if (ProgressFill.type == Image.Type.Filled)
+            {
+                ProgressFill.fillAmount = fill;
+                return;
+            }
+            var rect = ProgressFill.rectTransform;
+            var track = rect.parent as RectTransform;
+            var span = track != null ? track.rect.width - 2 * rect.anchoredPosition.x : 0;
+            span = Mathf.Max(0, span);
+            var sprite = ProgressFill.sprite;
+            var minWidth = sprite != null ? (sprite.border.x + sprite.border.z) / (sprite.pixelsPerUnit * ProgressFill.pixelsPerUnitMultiplier) : 0;
+            var width = fill <= 0 ? 0 : Mathf.Min(span, Mathf.Max(minWidth, span * fill));
+            rect.sizeDelta = new Vector2(width, rect.sizeDelta.y);
+        }
+
+        void CancelResult()
+        {
+            resultDelay?.Dispose();
+            resultDelay = null;
+        }
+
         void RenderFrame(float delta)
         {
             var data = Levels[CurrentLevel].Data;
-            var progress = 1f - (float)State.Remaining / State.Total;
-            ProgressNumber.text = Mathf.RoundToInt(progress * 100) + "%";
-            ProgressFill.fillAmount = progress;
+            var fill = 1f - (float)State.Remaining / State.Total;
+            ProgressNumber.text = Mathf.RoundToInt(fill * 100) + "%";
+            ShowProgress(fill);
             for (var i = 0; i < blockViews.Count; i++)
             {
                 var block = State.Blocks[i];
@@ -200,25 +392,23 @@ namespace JamJam
                 var start = BlockPosition(block.Definition, data);
                 if (block.Phase == 1)
                 {
-                    view.Body.GetComponent<SpriteRenderer>().sortingOrder=10;
-                    view.Arrow.GetComponent<SpriteRenderer>().sortingOrder=11;
-                    var distance=block.Travel*WoolRouting.Speed;
-                    WoolRouting.Evaluate(block.Route,distance,out var point,out var movement);
+                    WoolRouting.Evaluate(block.Route,block.Travel*WoolRouting.Speed,out var point,out var movement);
                     view.transform.position=new Vector3(point.X,0.12f,point.Z);
-                    view.transform.localScale=Vector3.one*WoolRouting.ScaleAt(distance);
-                    if(block.Travel>0)
-                    {
-                        var angle=Mathf.Atan2(movement.X,movement.Z)*Mathf.Rad2Deg;
-                        view.Arrow.localRotation=Quaternion.Euler(90,0,0)*Quaternion.Euler(0,0,-angle);
-                        var length=Mathf.Abs(movement.Z)>0.5f?block.Definition.Height:block.Definition.Width;
-                        view.Arrow.localScale=new Vector3(0.56f,length*Cell*0.78f,1);
-                    }
+                    view.transform.localScale=Vector3.one*feel.BlockScale(i);
+                    var heading=Quaternion.Euler(0,Mathf.Atan2(movement.X,movement.Z)*Mathf.Rad2Deg-WoolShape.Angle(block.Definition.Direction)+WoolShape.RestYaw(block.Definition.Direction),0);
+                    view.transform.rotation=delta==0?heading:Quaternion.RotateTowards(view.transform.rotation,heading,1080*delta);
                 }
                 else
                 {
                     view.Shake = Mathf.Max(0, view.Shake - delta);
                     view.transform.position = start + Vector3.right * Mathf.Sin(view.Shake * 95) * view.Shake * 0.26f;
                 }
+                var flash = feel.BlockFlash(i);
+                if (flash == blockFlashShown[i]) continue;
+                blockFlashShown[i] = flash;
+                blockTint ??= new MaterialPropertyBlock();
+                blockTint.SetColor(BaseColor, Color.Lerp(Art.Yarn[block.Definition.Color].GetColor(BaseColor), WoolFeel.FlashRed, flash));
+                view.Body.GetComponent<Renderer>().SetPropertyBlock(blockTint);
             }
             displayedHead=delta==0?State.Head:Mathf.Lerp(displayedHead,State.Head,1-Mathf.Exp(-12*delta));
             for (var i = 0; i < units.Count; i++)
@@ -244,35 +434,72 @@ namespace JamJam
             var headAngle=Mathf.Atan2(verticalDirection,horizontal)*Mathf.Rad2Deg+55;
             var headRotation=gameCamera.transform.rotation*Quaternion.AngleAxis(headAngle,Vector3.forward);
             dragon.rotation=delta==0?headRotation:Quaternion.RotateTowards(dragon.rotation,headRotation,240*delta);
+            dragon.localScale=Vector3.one*feel.DragonScale;
             for (var i = 0; i < spoolViews.Count; i++)
             {
                 var spool = State.Spools[i];
-                slots[i].Label.gameObject.SetActive(i >= State.OpenSlots);
-                slots[i].GetComponent<Renderer>().sharedMaterial = i < State.OpenSlots ? Art.Rim : Art.Road;
+                slots[i].Label.gameObject.SetActive(false);
+                var pad = slots[i].GetComponent<Renderer>();
+                pad.sharedMaterial = i < State.OpenSlots ? Art.Pad : Art.PadLocked;
+                slots[i].transform.localScale = Vector3.one * feel.SlotScale(i);
+                var padFlash = feel.SlotFlash(i);
+                if (padFlash != slotFlashShown[i])
+                {
+                    slotFlashShown[i] = padFlash;
+                    if (padFlash <= 0) pad.SetPropertyBlock(null);
+                    else
+                    {
+                        blockTint ??= new MaterialPropertyBlock();
+                        blockTint.SetColor(BaseColor, Color.Lerp(Art.Pad.GetColor(BaseColor), WoolFeel.FlashRed, padFlash));
+                        pad.SetPropertyBlock(blockTint);
+                    }
+                }
                 var visible = spool.Block >= 0 && spool.Arrival <= 0;
                 spoolViews[i].gameObject.SetActive(visible);
-                threads[i].enabled = visible && spool.Target >= 0;
+                var show = visible && spool.Remaining > 0 && spool.Target >= 0;
+                threads[i].enabled = show;
+                if (show)
+                {
+                    var goal = units[spool.Target].position + Vector3.up * 0.22f;
+                    if (threadTargets[i] < 0 || delta == 0) threadEnds[i] = goal;
+                    else threadEnds[i] = Vector3.Lerp(threadEnds[i], goal, 1 - Mathf.Exp(-18 * delta));
+                    threadTargets[i] = spool.Target;
+                }
+                else threadTargets[i] = -1;
                 if (!visible) continue;
                 Dye(spoolViews[i], spool.Color);
                 spoolLabels[i].text = spool.Remaining.ToString();
+                if (spoolShadows[i] != null) spoolShadows[i].text = spoolLabels[i].text;
                 var finish = spool.Remaining > 0 ? 1f : Mathf.Clamp01(spool.Finish / WoolGame.FinishDuration);
-                spoolViews[i].localScale = Vector3.one * finish;
+                spoolViews[i].localScale = Vector3.one * (finish * feel.SpoolScale(i));
                 var wrap = spoolViews[i].Find("YarnWrap");
                 if (wrap != null)
                 {
                     wrap.localScale = new Vector3(Mathf.Lerp(0.12f, 1, 1f - (float)spool.Remaining / spool.Capacity), 1, 1);
                     wrap.localRotation = Quaternion.Euler(State.Elapsed * (spool.Target >= 0 ? 600 : 0), 0, 0);
                 }
-                if (spool.Target < 0) continue;
+                if (!show) continue;
                 threads[i].sharedMaterial = Art.Thread[spool.Color];
-                var a = units[spool.Target].position + Vector3.up * 0.22f;
+                var a = threadEnds[i];
                 var b = spoolViews[i].position + Vector3.up * 0.15f;
+                var span = Vector3.Distance(a, b);
                 for (var j = 0; j < 20; j++)
                 {
                     var t = j / 19f;
-                    var point = Vector3.Lerp(a, b, t) + Vector3.up * (Mathf.Sin(t * Mathf.PI) * 0.6f) + Vector3.right * (Mathf.Sin(t * 22 + State.Elapsed * 35) * 0.018f * Mathf.Sin(t * Mathf.PI));
-                    threads[i].SetPosition(j, point);
+                    var sag = Mathf.Sin(t * Mathf.PI);
+                    var point = Vector3.Lerp(a, b, t) + Vector3.up * (0.35f * sag) + Vector3.back * (0.12f * span * sag) + Vector3.right * (Mathf.Sin(t * 22 + State.Elapsed * 35) * 0.018f * sag);
+                    threads[i].SetPosition(19 - j, point);
                 }
+            }
+            for (var i = 0; i < unlockButtons.Count; i++)
+            {
+                var button = unlockButtons[i];
+                var locked = i >= State.OpenSlots;
+                if (button.gameObject.activeSelf != locked) button.gameObject.SetActive(locked);
+                var next = i == State.OpenSlots;
+                if (button.interactable != next) button.interactable = next;
+                var alpha = next ? 1f : UnlockDisabledAlpha;
+                if (unlockGroups[i].alpha != alpha) unlockGroups[i].alpha = alpha;
             }
             var danger = Mathf.InverseLerp(0.8f, 1, State.Head / State.PathLength);
             kitten.position = kittenRest + Vector3.up * (Mathf.Sin(State.Elapsed * 3) * 0.025f);
@@ -337,13 +564,15 @@ namespace JamJam
             var vertices = new Vector3[path.Count * 2];
             var uv = new Vector2[vertices.Length];
             var triangles = new int[(path.Count - 1) * 6];
+            var distance = 0f;
             for (var i = 0; i < path.Count; i++)
             {
+                if (i > 0) distance += Vector3.Distance(path[i - 1], path[i]);
                 var tangent = path[Mathf.Min(i + 1, path.Count - 1)] - path[Mathf.Max(i - 1, 0)];
                 var right = Vector3.Cross(Vector3.up, tangent).normalized * halfWidth;
                 vertices[i * 2] = path[i] - right + Vector3.up * height;
                 vertices[i * 2 + 1] = path[i] + right + Vector3.up * height;
-                uv[i * 2] = new Vector2(0, i * 0.15f); uv[i * 2 + 1] = new Vector2(1, i * 0.15f);
+                uv[i * 2] = new Vector2(0, distance); uv[i * 2 + 1] = new Vector2(1, distance);
                 if (i == path.Count - 1) continue;
                 var k = i * 6; var v = i * 2;
                 triangles[k] = v; triangles[k + 1] = v + 2; triangles[k + 2] = v + 1;

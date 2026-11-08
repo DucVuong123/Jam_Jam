@@ -1,0 +1,251 @@
+{
+  "count": 35,
+  "checks": "Expected filenames, dimensions, 32-bit RGBA for transparent assets, corner alpha.",
+  "assets": [
+    {
+      "file": "Badge-Level.png",
+      "width": 384,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Banner-Ribbon-Green.png",
+      "width": 1024,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Banner-Ribbon-Red.png",
+      "width": 1024,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Button-Cream.png",
+      "width": 512,
+      "height": 192,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Button-Green.png",
+      "width": 512,
+      "height": 192,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Button-Orange.png",
+      "width": 512,
+      "height": 192,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Button-Red.png",
+      "width": 512,
+      "height": 192,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Button-Round-Cream.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Button-Round-Orange.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Back.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Check.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Home.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Lock.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Music.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Pause.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Play.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Retry.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Settings.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Sound.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Star.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-Vibration.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Icon-YarnBall.png",
+      "width": 256,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "LevelCard-Cleared.png",
+      "width": 1024,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "LevelCard-Current.png",
+      "width": 1024,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "LevelCard-Locked.png",
+      "width": 1024,
+      "height": 256,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Levels-Background.png",
+      "width": 1080,
+      "height": 2400,
+      "format": "Format24bppRgb",
+      "cornerAlpha": 255
+    },
+    {
+      "file": "Lobby-Background.png",
+      "width": 1080,
+      "height": 2400,
+      "format": "Format24bppRgb",
+      "cornerAlpha": 255
+    },
+    {
+      "file": "Lobby-Characters.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Logo-WoolJam.png",
+      "width": 1200,
+      "height": 600,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Panel-Card.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Progress-Fill.png",
+      "width": 1024,
+      "height": 96,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Progress-Track.png",
+      "width": 1024,
+      "height": 96,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Result-Lose-Kitten.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Result-Rays.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    },
+    {
+      "file": "Result-Win-Characters.png",
+      "width": 1024,
+      "height": 1024,
+      "format": "Format32bppArgb",
+      "cornerAlpha": 0
+    }
+  ]
+}

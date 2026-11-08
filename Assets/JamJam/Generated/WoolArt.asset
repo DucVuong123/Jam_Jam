@@ -35,3 +35,7 @@ MonoBehaviour:
   Confetti: {fileID: 6755635825629824449, guid: 2be45e35edacea6468348adf61a0e3b2, type: 3}
   Road: {fileID: 2100000, guid: d7c2e543d86521f43ae0b3fa6d6d0a71, type: 2}
   Rim: {fileID: 2100000, guid: 5e7b2c73b7d08ef4e8cdcfccd8cdf16f, type: 2}
+  Pad: {fileID: 2100000, guid: 7ffb158a2ac11004187aaedb58701277, type: 2}
+  PadLocked: {fileID: 2100000, guid: 485aa6faa4c73614c91e5c5eba6cfcc2, type: 2}
+  Puff: {fileID: 1277525767578246647, guid: ecda61957fb23ae48aa23841c53e6567, type: 3}
+  Sparkle: {fileID: 3932404410978242526, guid: 12b5bfc3372d9ee438e81f8f4a22b193, type: 3}

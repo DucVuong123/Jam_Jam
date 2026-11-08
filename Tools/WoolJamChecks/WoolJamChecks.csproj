@@ -8,7 +8,25 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="RouteChecks.cs" />
+    <Compile Include="ProgressChecks.cs" />
+    <Compile Include="StageChecks.cs" />
+    <Compile Include="ShapeChecks.cs" />
+    <Compile Include="GeneratorChecks.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolStage.cs" />
     <Compile Include="../../Assets/JamJam/Runtime/WoolRouting.cs" />
     <Compile Include="../../Assets/JamJam/Runtime/WoolGame.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolShape.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolPaths.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolSolver.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolLevelGenerator.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/IWoolPrefs.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolProgress.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolSettings.cs" />
+    <Compile Include="FeelChecks.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolFeelEvent.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolFeelTracker.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolEase.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolShake.cs" />
+    <Compile Include="../../Assets/JamJam/Runtime/WoolHapticPattern.cs" />
   </ItemGroup>
 </Project>

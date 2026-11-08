@@ -30,6 +30,15 @@ static class RouteChecks
         states = list;
     }
 
+    static float Outside(LevelDefinition level, RoutePoint point)
+    {
+        var halfX = level.Columns * WoolRouting.CellSize * 0.5f;
+        var halfZ = level.Rows * WoolRouting.CellSize * 0.5f;
+        var dx = Math.Abs(point.X) - halfX;
+        var dz = Math.Abs(point.Z - WoolRouting.BoardCenterZ) - halfZ;
+        return Math.Max(dx, dz);
+    }
+
     static void Validate(LevelDefinition level, IReadOnlyList<BlockState> blocks,
         IReadOnlyList<RoutePoint> route, float exit, int slot)
     {
@@ -46,37 +55,42 @@ static class RouteChecks
         }
         var arrowX=block.Direction==ExitDirection.Right?1:block.Direction==ExitDirection.Left?-1:0;
         var arrowZ=block.Direction==ExitDirection.Up?1:block.Direction==ExitDirection.Down?-1:0;
-        Check(Near(exit,0.5f), "Initial arrow move stops after half a cell before safe routing");
-        WoolRouting.Evaluate(route, exit, out var goal, out _);
-        Check(Near(goal.X,start.X+arrowX*exit) && Near(goal.Z,start.Z+arrowZ*exit),
-            "Initial nudge follows the arrow before a turn");
-        for (var distance = 0f; distance <= exit + 0.001f; distance += 0.125f)
+        Check(Near(route[1].X,start.X+arrowX*exit) && Near(route[1].Z,start.Z+arrowZ*exit),
+            "First segment follows the arrow for exactly the exit distance");
+        var halfAlong=(arrowX!=0?block.Width:block.Height)*WoolRouting.CellSize*0.5f;
+        Check(Outside(level,route[1])-halfAlong>=WoolRouting.ExitMargin-0.0002f,
+            "Exit leaves the whole full-size block past the board edge plus ExitMargin");
+        for(var i=1;i<route.Count;i++)
+            Check(Outside(level,route[i])>0,"Every point after the start lies outside the board rectangle");
+        var lane=WoolRouting.LaneZFor(level,block);
+        Check(WoolRouting.LaneFitsTray(level,block),"Board too tall for the tray lane");
+        Check(Near(route[route.Count-2].Z,lane) && Near(route[route.Count-2].X,end.X),
+            "Route enters the slot straight up from the top lane");
+        for(var distance=exit;distance<=WoolRouting.Length(route);distance+=0.0625f)
         {
-            WoolRouting.Evaluate(route, Math.Min(distance, exit), out var point, out _);
-            Check(Near(point.X,start.X+arrowX*Math.Min(distance,exit)) && Near(point.Z,start.Z+arrowZ*Math.Min(distance,exit)),
-                "Every point before board exit follows the original arrow");
-            var x = point.X - (block.Width - level.Columns) * 0.5f;
-            var y = point.Z - WoolRouting.BoardCenterZ - (block.Height - level.Rows) * 0.5f;
-            for (var i = 1; i < blocks.Count; i++)
-            {
-                if (blocks[i].Phase != 0) continue;
-                var other = blocks[i].Definition;
-                var overlap = x < other.X + other.Width - 0.0001f && x + block.Width > other.X + 0.0001f &&
-                    y < other.Y + other.Height - 0.0001f && y + block.Height > other.Y + 0.0001f;
-                Check(!overlap, "Moving full rectangle avoids static blocks through board exit");
-            }
+            WoolRouting.Evaluate(route,distance,out var point,out _);
+            Check(Outside(level,point)>=WoolRouting.RingOffset(block)-0.0002f,
+                "Full-size block stays off the board after its exit");
         }
         for(var distance=exit;distance<=WoolRouting.Length(route);distance+=0.0625f)
         {
             WoolRouting.Evaluate(route,distance,out var point,out _);
+            if(distance<=WoolRouting.Length(route)-Math.Abs(end.Z-lane)+0.0002f && point.Z>=lane-WoolRouting.MaxHalf(block)-0.0002f)
+                Check(point.Z+WoolRouting.MaxHalf(block)<=WoolRouting.TrayZ-WoolRouting.PadHalfDepth+0.0002f,
+                    "Block reach near lane height stays below the pad bottom");
+        }
+        for(var distance=0f;distance<=exit;distance+=0.125f)
+        {
+            WoolRouting.Evaluate(route,distance,out var point,out _);
+            var x=point.X/WoolRouting.CellSize-(block.Width-level.Columns)*0.5f;
+            var y=(point.Z-WoolRouting.BoardCenterZ)/WoolRouting.CellSize-(block.Height-level.Rows)*0.5f;
             for(var i=1;i<blocks.Count;i++)
             {
                 if(blocks[i].Phase!=0) continue;
                 var other=blocks[i].Definition;
-                var center=WoolRouting.BlockCenter(other,level);
-                var overlap=Math.Abs(point.X-center.X)<((block.Width+0.02f)*0.45f+other.Width+0.02f)*0.5f-0.0001f &&
-                    Math.Abs(point.Z-center.Z)<((block.Height+0.02f)*0.45f+other.Height+0.02f)*0.5f-0.0001f;
-                Check(!overlap,"Every moving sprite segment avoids stationary sprites after its initial nudge");
+                var overlap=x<other.X+other.Width-0.0001f && x+block.Width>other.X+0.0001f &&
+                    y<other.Y+other.Height-0.0001f && y+block.Height>other.Y+0.0001f;
+                Check(!overlap,"Full-size exit avoids static blocks");
             }
         }
     }
@@ -88,7 +102,7 @@ static class RouteChecks
         Check(route[1].X>route[0].X && Near(route[1].Z,route[0].Z),
             "Purple right arrow must move right before turning toward the tray");
         Validate(level,blocks,route,exit,0);
-        foreach(ExitDirection direction in Enum.GetValues(typeof(ExitDirection)))
+        foreach(var direction in new[] { ExitDirection.Up, ExitDirection.Right, ExitDirection.Down, ExitDirection.Left })
             foreach(var size in new[] { new[] {1,1},new[] {2,1},new[] {1,2} })
                 for(var slot=0;slot<6;slot++)
                 {
@@ -98,26 +112,35 @@ static class RouteChecks
                 }
 
         Setup(8,6,out level,out blocks,B(3,2,2,1,ExitDirection.Right));
-        Check(WoolRouting.TryFind(level,blocks,0,2,out route,out exit), "Open board has a short route");
-        Check(Near(exit,0.5f) && Math.Abs(route[2].Z-route[1].Z)>0.1f && WoolRouting.Length(route)<12,
-            "Right arrow can turn upward after a short nudge without reaching the far edge");
+        Check(WoolRouting.TryFind(level,blocks,0,2,out route,out exit), "Open board has a route");
+        var ring=level.Columns*WoolRouting.CellSize*0.5f+WoolRouting.RingOffset(blocks[0].Definition);
+        Check(Near(route[1].X,ring) && Near(exit,ring-WoolRouting.BlockCenter(blocks[0].Definition,level).X),
+            "Right arrow drives straight to the right ring before turning");
+        Check(Near(route[2].X,route[1].X) && route[2].Z>route[1].Z, "Side exit turns toward the tray");
         Validate(level,blocks,route,exit,2);
         Setup(8,6,out level,out blocks,B(3,2,2,1,ExitDirection.Right),B(3,3,2));
-        Check(WoolRouting.TryFind(level,blocks,0,2,out route,out exit), "Blocked early bend still finds a clear route");
-        var firstTurn=0f;
-        for(var i=1;i<route.Count;i++)
-        {
-            if(Math.Abs(route[i].Z-route[i-1].Z)>0.001f) break;
-            firstTurn+=Math.Abs(route[i].X-route[i-1].X);
-        }
-        Check(firstTurn>=1.5f,"Block continues along arrow until its reduced footprint has room to turn");
-        Validate(level,blocks,route,exit,2);
+        Check(WoolRouting.TryFind(level,blocks,0,2,out var beside,out var besideExit) && Near(besideExit,exit) && beside.Count==route.Count,
+            "Static block beside the lane does not bend the exit");
+        Validate(level,blocks,beside,besideExit,2);
+        Setup(8,6,out level,out blocks,B(1,0,1,1,ExitDirection.Down));
+        Check(WoolRouting.TryFind(level,blocks,0,0,out route,out exit) && route[2].X<0, "Down arrow near the left edge goes round the left side to slot 0");
+        Validate(level,blocks,route,exit,0);
+        Check(WoolRouting.TryFind(level,blocks,0,5,out route,out exit) && route[2].X>0, "Down arrow takes the right side when slot 5 makes it shorter");
+        Validate(level,blocks,route,exit,5);
+        var tallRows=(int)Math.Floor((WoolRouting.TrayZ-WoolRouting.PadHalfDepth-WoolRouting.LaneClearance-WoolRouting.BoardCenterZ-WoolRouting.ExitMargin-2*WoolRouting.CellSize)/(WoolRouting.CellSize*0.5f))+1;
+        Setup(8,tallRows-1,out level,out blocks,B(3,3,2,1));
+        Check(WoolRouting.LaneFitsTray(level,blocks[0].Definition),"One row below the limit with a wide block clears the tray pad");
+        Setup(8,tallRows,out level,out blocks,B(3,3,2,1));
+        Check(!WoolRouting.LaneFitsTray(level,blocks[0].Definition),"Rows at the limit with a wide block cannot clear the tray pad");
+        Check(WoolRouting.TryFind(level,blocks,0,1,out route,out exit) &&
+            Near(route[route.Count-2].Z,WoolRouting.LaneZFor(level,blocks[0].Definition)),
+            "Lane height is the per-block ring offset");
 
         Setup(5,5,out level,out blocks,B(2,1),B(1,2,3));
         Check(!WoolRouting.TryFind(level,blocks,0,2,out route,out exit), "Blocked arrow cannot detour around the wall");
         Check(route.Count==0 && exit==0,"Failed route has empty outputs");
         blocks[1].Phase=1;
-        Check(WoolRouting.TryFind(level,blocks,0,2,out route,out exit), "Earlier departure vacates its lane for planned FIFO route");
+        Check(WoolRouting.TryFind(level,blocks,0,2,out route,out exit), "Earlier departure vacates its lane for planned route");
         Validate(level,blocks,route,exit,2);
 
         Setup(5,5,out level,out blocks,B(2,2,1,1,ExitDirection.Down),
@@ -144,14 +167,10 @@ static class RouteChecks
         Setup(8,6,out level,out blocks,B(0,0,1,2,ExitDirection.Down),B(0,5,2));
         Check(WoolRouting.TryFind(level,blocks,0,0,out route,out exit), "Tall down arrow circles outside to first slot");
         Validate(level,blocks,route,exit,0);
-        var obstacle=WoolRouting.BlockCenter(blocks[1].Definition,level);
-        for(var distance=exit;distance<WoolRouting.Length(route);distance+=0.05f)
-        {
-            WoolRouting.Evaluate(route,distance,out var point,out _);
-            var overlap=Math.Abs(point.X-obstacle.X)<(1.02f*0.45f+2.02f)*0.5f &&
-                Math.Abs(point.Z-obstacle.Z)<(2.02f*0.45f+1.02f)*0.5f;
-            Check(!overlap,"Shrunk tall sprite avoids top row throughout outside route");
-        }
+        Check(route.Count==6 && route[2].X<route[1].X && Near(route[3].X,route[2].X) && route[3].Z>route[2].Z,
+            "Down exit runs along the bottom ring, up the side ring, then along the top lane");
+        Check(typeof(WoolRouting).GetMethod("ScaleAt")==null && typeof(WoolRouting).GetField("TravelScale")==null &&
+            typeof(WoolRouting).GetField("ArrowDistance")==null, "Shrink API is gone");
 
         IReadOnlyList<RoutePoint> elbow = new[] { new RoutePoint(0, 0), new RoutePoint(3, 0), new RoutePoint(3, 4) };
         Check(Near(WoolRouting.Length(elbow), 7), "Length sums Manhattan arc distance");

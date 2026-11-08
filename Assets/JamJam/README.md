@@ -8,7 +8,15 @@ Mở `Assets/Scenes/WoolJam.unity` và nhấn Play. Scene gameplay đã được
 - Ống cuộn tự hút len cùng màu đã lộ trên đường đi. Ống vào trước được ưu tiên, kể cả khi ô thấp vừa được dùng lại.
 - Ống đủ dung lượng tự biến mất. Nếu khay đầy, chờ ống hút xong hoặc chạm ô `+` để mở thêm chỗ.
 - Thu hết len để cứu mèo. Rồng đi tới vùng mèo thì thua.
-- Có pause/resume, retry và next. Màn đã mở được lưu bằng PlayerPrefs `JamJam.Level`.
+- Có pause/resume, retry và next. Tiến độ được lưu bằng PlayerPrefs `JamJam.Cleared` (số màn đã thắng; khóa cũ `JamJam.Level` được chuyển đổi tự động).
+
+## Lobby
+
+- Mở `Assets/Scenes/Lobby.unity` (build index 0) và nhấn Play để vào màn hình chính; `WoolJam` là build index 1.
+- `PLAY` vào màn chưa thắng đầu tiên, `LEVELS` mở danh sách màn (màn bị khóa sẽ rung khi chạm), `SETTINGS` bật/tắt âm thanh, nhạc, rung và đặt lại tiến độ.
+- Trong gameplay, nút `HOME` ở bảng pause và bảng kết quả quay về Lobby. Thắng màn cuối rồi nhấn next cũng về Lobby.
+- `JamJam/Build Lobby Scene`: tạo lại `Lobby.unity` và prefab `LevelCard`. Dừng Play và lưu mọi scene trước khi chạy.
+- `JamJam/Add Home Buttons`: thêm hai nút Home vào `WoolJam.unity` mà không tạo lại scene; chạy nhiều lần không tạo nút trùng.
 
 ## Dữ liệu và asset
 

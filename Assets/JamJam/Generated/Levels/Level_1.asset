@@ -18,67 +18,53 @@ MonoBehaviour:
     Rows: 4
     Slots: 4
     PathLength: 32.16851
-    InitialHead: 13.5
-    Speed: 0.21
+    InitialHead: 12.22
+    Speed: 0.381
     Spacing: 0.36
     Blocks:
     - X: 0
-      Y: 0
-      Width: 2
-      Height: 1
-      Direction: 3
-      Color: 0
-      Capacity: 4
-    - X: 2
-      Y: 0
-      Width: 2
-      Height: 1
-      Direction: 1
-      Color: 2
-      Capacity: 5
-    - X: 0
-      Y: 1
-      Width: 2
-      Height: 1
-      Direction: 3
-      Color: 1
-      Capacity: 5
-    - X: 2
-      Y: 1
-      Width: 2
-      Height: 1
-      Direction: 1
-      Color: 0
-      Capacity: 6
-    - X: 0
-      Y: 2
-      Width: 2
-      Height: 1
-      Direction: 3
-      Color: 2
-      Capacity: 6
-    - X: 2
-      Y: 2
-      Width: 2
-      Height: 1
-      Direction: 1
-      Color: 1
-      Capacity: 4
-    - X: 0
       Y: 3
       Width: 2
       Height: 1
       Direction: 3
-      Color: 0
+      Color: 5
       Capacity: 4
-    - X: 2
-      Y: 3
+    - X: 0
+      Y: 2
       Width: 2
       Height: 1
       Direction: 1
-      Color: 2
-      Capacity: 5
-    Yarn: 000000000000000000000000000000000200000002000000020000000200000002000000010000000100000001000000010000000100000000000000000000000000000000000000000000000000000002000000020000000200000002000000020000000200000001000000010000000100000001000000000000000000000000000000000000000200000002000000020000000200000002000000
+      Color: 5
+      Capacity: 3
+    - X: 0
+      Y: 0
+      Width: 1
+      Height: 2
+      Direction: 2
+      Color: 5
+      Capacity: 3
+    - X: 1
+      Y: 0
+      Width: 1
+      Height: 2
+      Direction: 3
+      Color: 3
+      Capacity: 4
+    - X: 2
+      Y: 0
+      Width: 1
+      Height: 2
+      Direction: 0
+      Color: 3
+      Capacity: 4
+    - X: 3
+      Y: 0
+      Width: 1
+      Height: 2
+      Direction: 2
+      Color: 3
+      Capacity: 3
+    Yarn: 030000000300000003000000050000000500000005000000050000000500000005000000050000000300000003000000030000000300000005000000050000000500000003000000030000000300000003000000
   Path:
   - {x: -4, y: 0, z: 8}
   - {x: -3.806478, y: 0, z: 8.001425}

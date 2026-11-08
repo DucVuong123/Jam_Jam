@@ -15,5 +15,9 @@ namespace JamJam
         public GameObject Confetti;
         public Material Road;
         public Material Rim;
+        public Material Pad;
+        public Material PadLocked;
+        public GameObject Puff;
+        public GameObject Sparkle;
     }
 }

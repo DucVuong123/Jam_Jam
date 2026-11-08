@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace JamJam
 {
-    public enum ExitDirection { Up, Right, Down, Left }
+    public enum ExitDirection { Up, Right, Down, Left, UpRight, DownRight, DownLeft, UpLeft }
     public enum RoundStatus { Playing, Won, Lost }
 
     [Serializable]
     public struct BlockDefinition
     {
-        public int X;
-        public int Y;
+        public float X;
+        public float Y;
         public int Width;
         public int Height;
         public ExitDirection Direction;
@@ -41,6 +41,8 @@ namespace JamJam
         public float ExitDistance;
         public IReadOnlyList<RoutePoint> Route = Array.Empty<RoutePoint>();
         public int Slot = -1;
+        public int Order;
+        public bool Yielding;
     }
 
     public sealed class SpoolState
@@ -72,7 +74,7 @@ namespace JamJam
         readonly List<YarnState> yarn = new List<YarnState>();
         readonly List<SpoolState> spools = new List<SpoolState>();
         readonly List<int> spoolOrder = new List<int>();
-        readonly Queue<int> departures = new Queue<int>();
+        int selectCounter;
         public IReadOnlyList<BlockState> Blocks => blocks;
         public IReadOnlyList<YarnState> Yarn => yarn;
         public IReadOnlyList<SpoolState> Spools => spools;
@@ -109,17 +111,20 @@ namespace JamJam
                 errors.Add("Invalid level dimensions or timing");
             if (data.Blocks == null || data.Yarn == null || data.Blocks.Length == 0 || data.Yarn.Length == 0)
             { errors.Add("Level is empty"); return errors; }
-            var occupied = new HashSet<long>();
+            var footprints = new List<IReadOnlyList<ShapePoint>>();
             var balance = new int[6];
             foreach (var b in data.Blocks)
             {
-                if (b.X < 0 || b.Y < 0 || b.Width < 1 || b.Height < 1 || b.X + b.Width > data.Columns ||
-                    b.Y + b.Height > data.Rows || b.Color < 0 || b.Color >= 6 || b.Capacity < 1 || (int)b.Direction > 3 || (int)b.Direction < 0)
+                if (b.Width < 1 || b.Height < 1 || float.IsNaN(b.X) || float.IsNaN(b.Y) || float.IsInfinity(b.X) || float.IsInfinity(b.Y) ||
+                    b.Color < 0 || b.Color >= 6 || b.Capacity < 1 || !WoolShape.IsValid(b.Direction))
                 { errors.Add("Invalid block"); continue; }
+                WoolShape.Footprint(b, out var footprint);
+                if (!WoolShape.Inside(footprint, data.Columns, data.Rows)) { errors.Add("Invalid block"); continue; }
+                if (!WoolRouting.LaneFitsTray(data, b) && !errors.Contains("Board too tall for the tray lane")) errors.Add("Board too tall for the tray lane");
                 balance[b.Color] += b.Capacity;
-                for (var x = b.X; x < b.X + b.Width; x++)
-                    for (var y = b.Y; y < b.Y + b.Height; y++)
-                        if (!occupied.Add(((long)x << 32) | (uint)y)) errors.Add("Overlapping blocks");
+                foreach (var other in footprints)
+                    if (WoolShape.Overlaps(footprint, other)) errors.Add("Overlapping blocks");
+                footprints.Add(footprint);
             }
             foreach (var color in data.Yarn)
                 if (color < 0 || color >= 6) errors.Add("Invalid yarn color"); else balance[color]--;
@@ -146,35 +151,7 @@ namespace JamJam
 
         bool HasClearArrowLane(int index)
         {
-            var a=blocks[index].Definition;
-            const float epsilon=0.0001f;
-            for(var i=0;i<blocks.Count;i++)
-            {
-                var other=blocks[i];
-                if(i==index || other.Phase==2) continue;
-                var b=other.Definition;
-                var x=(float)b.X; var y=(float)b.Y;
-                var width=(float)b.Width; var height=(float)b.Height;
-                if(other.Phase==1)
-                {
-                    WoolRouting.Evaluate(other.Route,other.Travel*WoolRouting.Speed,out var point,out _);
-                    x=point.X-(b.Width-level.Columns)*0.5f;
-                    y=point.Z-WoolRouting.BoardCenterZ-(b.Height-level.Rows)*0.5f;
-                    var scale=WoolRouting.ScaleAt(other.Travel*WoolRouting.Speed);
-                    x+=width*(1-scale)*0.5f; y+=height*(1-scale)*0.5f;
-                    width*=scale; height*=scale;
-                }
-                var left=Math.Max(0,x); var right=Math.Min(level.Columns,x+width);
-                var bottom=Math.Max(0,y); var top=Math.Min(level.Rows,y+height);
-                if(right-left<=epsilon || top-bottom<=epsilon) continue;
-                var overlapX=a.X<right-epsilon && a.X+a.Width>left+epsilon;
-                var overlapY=a.Y<top-epsilon && a.Y+a.Height>bottom+epsilon;
-                if((a.Direction==ExitDirection.Up && overlapX && top>a.Y+a.Height+epsilon) ||
-                    (a.Direction==ExitDirection.Down && overlapX && bottom<a.Y-epsilon) ||
-                    (a.Direction==ExitDirection.Right && overlapY && right>a.X+a.Width+epsilon) ||
-                    (a.Direction==ExitDirection.Left && overlapY && left<a.X-epsilon)) return false;
-            }
-            return true;
+            return WoolShape.LaneClear(level, blocks, index, true);
         }
 
         public bool Select(int index)
@@ -182,12 +159,13 @@ namespace JamJam
             if (!TryPrepareSelection(index, out var slot, out var route, out var exitDistance)) return false;
             var block = blocks[index];
             block.Phase = 1;
+            block.Order = ++selectCounter;
+            block.Yielding = false;
             block.Slot = slot;
             block.Travel = 0;
             block.Route = route;
             block.Duration = WoolRouting.Length(route) / WoolRouting.Speed;
             block.ExitDistance = exitDistance;
-            departures.Enqueue(index);
             var spool = spools[slot];
             spoolOrder.Remove(slot);
             spoolOrder.Add(slot);
@@ -224,18 +202,19 @@ namespace JamJam
             if (Status == RoundStatus.Playing)
             {
                 Elapsed += delta;
-                Head += level.Speed * delta;
+                Head = (float)(Head + (float)(level.Speed * delta));
             }
-            if (departures.Count > 0)
+            var lead = int.MaxValue;
+            foreach (var block in blocks)
+                if (block.Phase == 1 && block.Order < lead) lead = block.Order;
+            foreach (var block in blocks)
+                block.Yielding = block.Phase == 1 && block.Order != lead && ShouldYield(block, delta);
+            foreach (var block in blocks)
             {
-                var block = blocks[departures.Peek()];
-                block.Travel = Math.Min(block.Duration, block.Travel + delta);
-                spools[block.Slot].Arrival = Math.Max(0, block.Duration - block.Travel);
-                if (block.Travel >= block.Duration)
-                {
-                    block.Phase = 2;
-                    departures.Dequeue();
-                }
+                if (block.Phase != 1 || block.Yielding) continue;
+                block.Travel = Math.Min(block.Duration, (float)(block.Travel + delta));
+                spools[block.Slot].Arrival = Math.Max(0, (float)(block.Duration - block.Travel));
+                if (block.Travel >= block.Duration) block.Phase = 2;
             }
             foreach (var i in spoolOrder)
             {
@@ -259,7 +238,7 @@ namespace JamJam
                     spool.Target = -1;
                     spool.Remaining--;
                     Remaining--;
-                    Head = Math.Max(0.25f, Head - level.Spacing * 0.45f);
+                    Head = Math.Max(0.25f, (float)(Head - (float)(level.Spacing * 0.45f)));
                     if (spool.Remaining == 0) spool.Finish = FinishDuration;
                     RefreshDistances();
                 }
@@ -281,13 +260,40 @@ namespace JamJam
             else if (Head >= level.PathLength) Status = RoundStatus.Lost;
         }
 
+        bool OffBoard(BlockState block)
+        {
+            return block.Phase == 1 && (float)(block.Travel * WoolRouting.Speed) > block.ExitDistance;
+        }
+
+        bool SeesAhead(BlockState block, BlockState other, float delta)
+        {
+            WoolRouting.Evaluate(block.Route, block.Travel * WoolRouting.Speed, out var position, out var heading);
+            WoolRouting.Evaluate(block.Route, Math.Min(block.Duration, block.Travel + delta) * WoolRouting.Speed, out var next, out _);
+            WoolRouting.Evaluate(other.Route, other.Travel * WoolRouting.Speed, out var otherPosition, out var otherHeading);
+            if (heading.X * otherHeading.X + heading.Z * otherHeading.Z < 0) return false;
+            if ((otherPosition.X - position.X) * heading.X + (otherPosition.Z - position.Z) * heading.Z <= 0) return false;
+            var reach = WoolRouting.MaxHalf(block.Definition) + WoolRouting.MaxHalf(other.Definition);
+            return Math.Abs(next.X - otherPosition.X) < reach && Math.Abs(next.Z - otherPosition.Z) < reach;
+        }
+
+        bool ShouldYield(BlockState block, float delta)
+        {
+            foreach (var other in blocks)
+            {
+                if (other == block || !OffBoard(other) || !SeesAhead(block, other, delta)) continue;
+                if (SeesAhead(other, block, delta) && block.Order < other.Order) continue;
+                return true;
+            }
+            return false;
+        }
+
         void RefreshDistances()
         {
             var rank = 0;
             foreach (var unit in yarn)
             {
                 if (unit.Consumed) continue;
-                unit.Distance = Head - (++rank) * level.Spacing;
+                unit.Distance = (float)(Head - (float)((++rank) * level.Spacing));
             }
         }
     }
